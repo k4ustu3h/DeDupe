@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DeDupe</string>
+    <string name="scan">Scan for Duplicates</string>
+    <string name="delete_selected">Delete Selected</string>
+</resources>
