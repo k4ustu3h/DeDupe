@@ -5,6 +5,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
 import java.util.PriorityQueue
+import kotlin.math.log10
+import kotlin.math.pow
 
 object FileUtils {
 
@@ -130,5 +132,15 @@ object FileUtils {
     fun exampleCost(file: File): Int {
         // Calculate the cost based on the file's length (size).
         return file.length().toInt()
+    }
+
+    fun getFileSize(file: File): String {
+        val bytes = file.length()
+        if (bytes <= 0) return "0 B"
+        val units = arrayOf("B", "KB", "MB", "GB", "TB")
+        val digitGroups = (log10(bytes.toDouble()) / log10(1024.0)).toInt()
+        return String.format(
+            "%.2f %s", bytes / 1024.0.pow(digitGroups.toDouble()), units[digitGroups]
+        )
     }
 }
