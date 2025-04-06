@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.Item
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
 import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
 import k4ustu3h.dedupe.utils.FileUtils
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+
+    private var isAscending = true
+    private var currentSortComparator: Comparator<Item<*>>? = compareByName()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +71,20 @@ class MainActivity : AppCompatActivity() {
         binding.sortButton.setOnClickListener { v ->
             showSortPopupMenu(v)
         }
+        binding.orderToggleButton.setOnClickListener {
+            isAscending = !isAscending
+            updateToggleButtonIcon()
+            sortCurrentList(currentSortComparator)
+        }
+        updateToggleButtonIcon()
+    }
+
+    private fun updateToggleButtonIcon() {
+        if (isAscending) {
+            binding.orderToggleButton.setImageResource(R.drawable.sort_ascending)
+        } else {
+            binding.orderToggleButton.setImageResource(R.drawable.sort_descending)
+        }
     }
 
     private fun showSortPopupMenu(view: View) {
@@ -76,52 +94,16 @@ class MainActivity : AppCompatActivity() {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.sort_by_name -> {
-                    sortDuplicateFiles(Comparator<com.xwray.groupie.Item<*>> { item1, item2 ->
-                        when {
-                            item1 is DuplicateFileItem && item2 is DuplicateFileItem -> {
-                                item1.file.name.compareToNatural(item2.file.name, true)
-                            }
-
-                            item1 is SingleFileItem && item2 is SingleFileItem -> {
-                                item1.file.name.compareToNatural(item2.file.name, true)
-                            }
-
-                            item1 is DuplicateFileItem && item2 is SingleFileItem -> {
-                                item1.file.name.compareToNatural(item2.file.name, true)
-                            }
-
-                            item1 is SingleFileItem && item2 is DuplicateFileItem -> {
-                                item1.file.name.compareToNatural(item2.file.name, true)
-                            }
-
-                            else -> 0
-                        }
-                    })
+                    val nameComparator = compareByName()
+                    currentSortComparator = nameComparator
+                    sortCurrentList(nameComparator)
                     true
                 }
 
                 R.id.sort_by_size -> {
-                    sortDuplicateFiles(Comparator<com.xwray.groupie.Item<*>> { item1, item2 ->
-                        when {
-                            item1 is DuplicateFileItem && item2 is DuplicateFileItem -> {
-                                item1.file.length().compareTo(item2.file.length())
-                            }
-
-                            item1 is SingleFileItem && item2 is SingleFileItem -> {
-                                item1.file.length().compareTo(item2.file.length())
-                            }
-
-                            item1 is DuplicateFileItem && item2 is SingleFileItem -> {
-                                item1.file.length().compareTo(item2.file.length())
-                            }
-
-                            item1 is SingleFileItem && item2 is DuplicateFileItem -> {
-                                item1.file.length().compareTo(item2.file.length())
-                            }
-
-                            else -> 0
-                        }
-                    })
+                    val sizeComparator = compareBySize()
+                    currentSortComparator = sizeComparator
+                    sortCurrentList(sizeComparator)
                     true
                 }
 
@@ -131,14 +113,61 @@ class MainActivity : AppCompatActivity() {
         popupMenu.show()
     }
 
-    private fun sortDuplicateFiles(comparator: Comparator<com.xwray.groupie.Item<*>>) {
-        val allItems = mutableListOf<com.xwray.groupie.Item<*>>()
+    private fun sortCurrentList(comparator: Comparator<Item<*>>?) {
+        val currentItems = mutableListOf<Item<*>>()
         for (i in 0 until adapter.itemCount) {
-            allItems.add(adapter.getItem(i))
+            currentItems.add(adapter.getItem(i))
         }
-        allItems.sortWith(comparator)
+
+        if (comparator != null) {
+            val finalComparator = if (isAscending) {
+                comparator
+            } else {
+                comparator.reversed()
+            }
+            currentItems.sortWith(finalComparator)
+        } else {
+            currentItems.sortWith(compareByName())
+        }
+
         adapter.clear()
-        adapter.addAll(allItems)
+        adapter.addAll(currentItems)
+    }
+
+    private fun compareByName(): Comparator<Item<*>> = Comparator { item1, item2 ->
+        when {
+            item1 is DuplicateFileItem && item2 is DuplicateFileItem -> {
+                item1.file.name.compareToNatural(item2.file.name, true)
+            }
+
+            item1 is SingleFileItem && item2 is SingleFileItem -> {
+                item1.file.name.compareToNatural(item2.file.name, true)
+            }
+
+            item1 is DuplicateFileItem && item2 is SingleFileItem -> {
+                item1.file.name.compareToNatural(item2.file.name, true)
+            }
+
+            item1 is SingleFileItem && item2 is DuplicateFileItem -> {
+                item1.file.name.compareToNatural(item2.file.name, true)
+            }
+
+            else -> 0
+        }
+    }
+
+    private fun compareBySize(): Comparator<Item<*>> = Comparator { item1, item2 ->
+        val size1 = when (item1) {
+            is DuplicateFileItem -> item1.file.length()
+            is SingleFileItem -> item1.file.length()
+            else -> 0
+        }
+        val size2 = when (item2) {
+            is DuplicateFileItem -> item2.file.length()
+            is SingleFileItem -> item2.file.length()
+            else -> 0
+        }
+        size1.compareTo(size2)
     }
 
     private fun checkAndRequestManageStoragePermission() {
@@ -177,12 +206,11 @@ class MainActivity : AppCompatActivity() {
             val fileMap = mutableMapOf<String, MutableList<File>>()
             FileUtils.traverseFiles(root, fileMap)
 
-            val allItems = mutableListOf<com.xwray.groupie.Item<*>>()
+            val allItems = mutableListOf<Item<*>>()
 
             fileMap.values.forEach { files ->
                 if (files.size > 1) {
                     val duplicateGroup = DuplicateFilesGroup(files)
-                    // Add each item from the group to the allItems list
                     for (i in 0 until duplicateGroup.itemCount) {
                         allItems.add(duplicateGroup.getItem(i))
                     }
@@ -195,16 +223,17 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.visibility = View.GONE
                 adapter.clear()
                 adapter.addAll(allItems)
+                sortCurrentList(currentSortComparator)
             }
         }
     }
 
     private fun deleteSelectedFiles() {
         val selectedFiles = mutableSetOf<File>()
-        for (groupPosition in 0 until adapter.groupCount) {
-            val group = adapter.getGroup(groupPosition)
-            if (group is DuplicateFilesGroup) {
-                selectedFiles.addAll(group.getSelectedFiles())
+        for (i in 0 until adapter.itemCount) {
+            val item = adapter.getItem(i)
+            if (item is DuplicateFileItem && item.isSelected()) {
+                selectedFiles.add(item.file)
             }
         }
 

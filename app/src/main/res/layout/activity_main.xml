@@ -6,20 +6,39 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/sortButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:text="Sort" />
+        android:id="@+id/sortButtons">
+
+        <Button
+            android:id="@+id/sortButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort" />
+
+        <ImageButton
+            android:id="@+id/orderToggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Toggle Sort Order"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/sort_ascending" />
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/progressBar"
-        android:layout_below="@id/sortButton" />
+        android:layout_below="@id/sortButtons" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progressBar"
