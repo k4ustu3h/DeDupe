@@ -42,7 +42,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.groupie) // Or your desired version
+    implementation(libs.groupie)
     implementation(libs.groupie.kotlin.android.extensions)
     implementation(libs.groupie.viewbinding)
 }
