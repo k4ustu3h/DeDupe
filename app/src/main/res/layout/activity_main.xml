@@ -11,7 +11,7 @@
         android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorSurface"
+        app:navigationIcon="@drawable/ic_launcher_foreground"
         app:title="@string/app_name">
 
         <ImageButton
