@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe.utils
+package k4ustu3h.dedupe.util
 
 import android.util.Log
 import java.io.File

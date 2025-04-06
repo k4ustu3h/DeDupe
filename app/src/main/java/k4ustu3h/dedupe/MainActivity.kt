@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -22,15 +21,10 @@ import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.BalloonAnimation
 import com.xwray.groupie.GroupAdapter
-import k4ustu3h.dedupe.components.DuplicateFilesGroup
 import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
-import k4ustu3h.dedupe.utils.FileUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
+import k4ustu3h.dedupe.util.DeletionUtils
+import k4ustu3h.dedupe.util.ScanUtils
 
 class MainActivity : AppCompatActivity() {
 
@@ -119,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         if (!Environment.isExternalStorageManager()) {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory("android.intent.category.DEFAULT")
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.data = String.format("package:%s", applicationContext.packageName).toUri()
                 manageStorageActivityResultLauncher.launch(intent)
             } catch (_: Exception) {
@@ -156,51 +150,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startScan() {
-        binding.progressBar.visibility = View.VISIBLE
-        CoroutineScope(Dispatchers.IO).launch {
-            val root = Environment.getExternalStorageDirectory()
-            val fileMap = mutableMapOf<String, MutableList<File>>()
-            val sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
-            val applySizeLimit = sharedPreferences.getBoolean("enable_file_size_limit", false)
-
-            FileUtils.traverseFiles(root, fileMap, applySizeLimit)
-
-            withContext(Dispatchers.Main) {
-                binding.progressBar.visibility = View.GONE
-                adapter.clear()
-                fileMap.values.forEach { files ->
-                    if (files.size > 1) {
-                        adapter.add(DuplicateFilesGroup(files))
-                    }
-                }
-                if (adapter.itemCount == 0) {
-                    Toast.makeText(
-                        this@MainActivity, "No duplicate files found", Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
+        ScanUtils.scanForDuplicates(this, binding.progressBar, adapter)
     }
 
     private fun deleteSelectedFiles() {
-        val selectedFiles = mutableSetOf<File>()
-        for (groupPosition in 0 until adapter.groupCount) {
-            val group = adapter.getGroup(groupPosition)
-            if (group is DuplicateFilesGroup) {
-                selectedFiles.addAll(group.getSelectedFiles())
-            }
-        }
-
-        selectedFiles.forEach { file ->
-            if (file.exists()) {
-                if (file.delete()) {
-                    Log.d("Delete", "file deleted: ${file.absolutePath}")
-                } else {
-                    Log.e("Delete", "file could not be deleted: ${file.absolutePath}")
-                    Toast.makeText(this, "File could not be deleted", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        startScan()
+        DeletionUtils.deleteSelected(this, adapter) { startScan() }
     }
 }

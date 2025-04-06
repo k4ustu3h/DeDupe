@@ -8,7 +8,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import k4ustu3h.dedupe.R
-import k4ustu3h.dedupe.utils.FileUtils
+import k4ustu3h.dedupe.util.FileUtils
 import java.io.File
 
 class DuplicateFileCard(private val files: List<File>) :

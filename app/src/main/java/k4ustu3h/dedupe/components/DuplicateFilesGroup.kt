@@ -6,11 +6,13 @@ import com.xwray.groupie.Item
 import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import java.io.File
 
-class DuplicateFilesGroup(private val files: List<File>) : Group {
+class DuplicateFilesGroup(files: List<File>) : Group {
+
+    private val duplicateFileCard = DuplicateFileCard(files)
 
     override fun getItemCount(): Int = 1
 
-    override fun getItem(position: Int): Item<*> = DuplicateFileCard(files)
+    override fun getItem(position: Int): Item<*> = duplicateFileCard
 
     override fun getPosition(item: Item<*>): Int = 0
 
@@ -19,6 +21,6 @@ class DuplicateFilesGroup(private val files: List<File>) : Group {
     override fun unregisterGroupDataObserver(observer: GroupDataObserver) {}
 
     fun getSelectedFiles(): Set<File> {
-        return (getItem(0) as? DuplicateFileCard)?.getSelectedFiles() ?: emptySet()
+        return duplicateFileCard.getSelectedFiles()
     }
 }
