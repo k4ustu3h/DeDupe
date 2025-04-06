@@ -45,4 +45,5 @@ dependencies {
     implementation(libs.groupie)
     implementation(libs.groupie.kotlin.android.extensions)
     implementation(libs.groupie.viewbinding)
+    implementation(libs.kotlinx.coroutines.android)
 }

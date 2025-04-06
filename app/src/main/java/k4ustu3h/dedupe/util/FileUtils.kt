@@ -1,10 +1,9 @@
-// FileUtils.kt
-package k4ustu3h.dedupe.utils
+package k4ustu3h.dedupe.util
 
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
-import java.util.PriorityQueue
+import java.util.Locale
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -21,7 +20,7 @@ object FileUtils {
         val files = directory.listFiles()
 
         // If the directory is empty or null, return.
-        if (files == null) return;
+        if (files == null) return
 
         // Iterate through each file and directory.
         for (file in files) {
@@ -94,53 +93,52 @@ object FileUtils {
         return String(hexArray)
     }
 
-    /**
-     * Prioritizes files for deletion based on a cost function.
-     *
-     * @param files The list of files to prioritize.
-     * @param costFunction A function that calculates the cost of deleting a file.
-     * @return A list of files in prioritized order (ascending cost).
-     */
-    fun prioritizeFilesForDeletion(files: List<File>, costFunction: (File) -> Int): List<File> {
-        // Create a priority queue to store files and their costs.
-        val priorityQueue = PriorityQueue<Pair<File, Int>>(compareBy { it.second })
-
-        // Iterate through each file and add it to the priority queue with its cost.
-        for (file in files) {
-            val cost = costFunction(file)
-            priorityQueue.offer(Pair(file, cost))
-        }
-
-        // Create a list to store the prioritized files.
-        val prioritizedFiles = mutableListOf<File>()
-
-        // Poll files from the priority queue and add them to the prioritized list.
-        while (priorityQueue.isNotEmpty()) {
-            prioritizedFiles.add(priorityQueue.poll().first)
-        }
-
-        // Return the list of prioritized files.
-        return prioritizedFiles
-    }
-
-    /**
-     * Example cost function: Cost based on file size (larger files have higher cost).
-     *
-     * @param file The file to calculate the cost for.
-     * @return The cost of deleting the file.
-     */
-    fun exampleCost(file: File): Int {
-        // Calculate the cost based on the file's length (size).
-        return file.length().toInt()
-    }
-
     fun getFileSize(file: File): String {
         val bytes = file.length()
         if (bytes <= 0) return "0 B"
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
         val digitGroups = (log10(bytes.toDouble()) / log10(1024.0)).toInt()
         return String.format(
-            "%.2f %s", bytes / 1024.0.pow(digitGroups.toDouble()), units[digitGroups]
+            Locale.getDefault(),
+            "%.2f %s",
+            bytes / 1024.0.pow(digitGroups.toDouble()),
+            units[digitGroups]
         )
+    }
+
+    fun String.compareToNatural(other: String, ignoreCase: Boolean = false): Int {
+        var i = 0
+        var j = 0
+        while (i < this.length || j < other.length) {
+            val chunk1 = StringBuilder()
+            while (i < this.length && this[i].isDigit()) {
+                chunk1.append(this[i++])
+            }
+            val chunk2 = StringBuilder()
+            while (j < other.length && other[j].isDigit()) {
+                chunk2.append(other[j++])
+            }
+
+            if (chunk1.isNotEmpty() && chunk2.isNotEmpty()) {
+                val n1 = chunk1.toString().toInt()
+                val n2 = chunk2.toString().toInt()
+                val comparison = n1.compareTo(n2)
+                if (comparison != 0) return comparison
+            } else {
+                val char1 = if (i < this.length) this[i++] else null
+                val char2 = if (j < other.length) other[j++] else null
+
+                if (char1 == null && char2 == null) return 0
+                if (char1 == null) return -1
+                if (char2 == null) return 1
+
+                val c1 = if (ignoreCase) char1.lowercaseChar() else char1
+                val c2 = if (ignoreCase) char2.lowercaseChar() else char2
+
+                val comparison = c1.compareTo(c2)
+                if (comparison != 0) return comparison
+            }
+        }
+        return 0
     }
 }

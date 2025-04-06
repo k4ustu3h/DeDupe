@@ -1,11 +1,12 @@
-package k4ustu3h.dedupe
+package k4ustu3h.dedupe.components.item
 
 import android.graphics.Typeface
 import android.view.View
 import androidx.core.view.updatePadding
 import com.xwray.groupie.viewbinding.BindableItem
+import k4ustu3h.dedupe.R
 import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
-import k4ustu3h.dedupe.utils.FileUtils
+import k4ustu3h.dedupe.util.FileUtils
 import java.io.File
 
 class DuplicateFileItem(val file: File, private val isOriginal: Boolean) :

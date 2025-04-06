@@ -1,18 +1,19 @@
-// DuplicateFilesGroup.kt
-package k4ustu3h.dedupe
+package k4ustu3h.dedupe.components
 
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupDataObserver
+import com.xwray.groupie.Item
+import k4ustu3h.dedupe.components.item.DuplicateFileItem
 import java.io.File
 
 class DuplicateFilesGroup(private val files: List<File>) : Group {
 
     override fun getItemCount(): Int = files.size
 
-    override fun getItem(position: Int): com.xwray.groupie.Item<*> =
+    override fun getItem(position: Int): Item<*> =
         DuplicateFileItem(files[position], position == 0)
 
-    override fun getPosition(item: com.xwray.groupie.Item<*>): Int =
+    override fun getPosition(item: Item<*>): Int =
         files.indexOf((item as DuplicateFileItem).file)
 
     override fun registerGroupDataObserver(observer: GroupDataObserver) {

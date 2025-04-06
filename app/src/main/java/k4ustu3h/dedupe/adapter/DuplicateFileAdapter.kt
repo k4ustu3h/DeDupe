@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe
+package k4ustu3h.dedupe.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import k4ustu3h.dedupe.R
 import java.io.File
 
 class DuplicateFileAdapter(private val duplicateFiles: List<Pair<File, File>>) :
