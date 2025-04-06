@@ -3,7 +3,6 @@ package k4ustu3h.dedupe.util
 import android.os.Environment
 import com.xwray.groupie.Item
 import k4ustu3h.dedupe.components.DuplicateFilesGroup
-import k4ustu3h.dedupe.components.item.SingleFileItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -23,8 +22,6 @@ object ScanUtils {
                 for (i in 0 until duplicateGroup.itemCount) {
                     allItems.add(duplicateGroup.getItem(i))
                 }
-            } else if (files.size == 1 && files[0].parentFile?.absolutePath == root.absolutePath) {
-                allItems.add(SingleFileItem(files[0]))
             }
         }
         return@withContext allItems
