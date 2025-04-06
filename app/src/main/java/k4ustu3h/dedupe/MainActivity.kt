@@ -31,14 +31,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val adapter =
         GroupAdapter<com.xwray.groupie.viewbinding.GroupieViewHolder<TreeDuplicateItemBinding>>()
-    private var isAscending = true
+    private var isAscending = false
     private var currentSortComparator: Comparator<Item<*>>? = SortUtils.compareByName()
     private val manageStorageActivityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (Environment.isExternalStorageManager()) {
                 startScan()
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -68,9 +66,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         binding.deleteButton.setOnClickListener {
-            DeletionUtils.deleteSelectedFiles(
-                adapter, this
-            ) { startScan() } // Passing 'this' as the context
+            DeletionUtils.deleteSelectedFiles(adapter, this) { startScan() }
         }
         binding.sortButton.setOnClickListener { v ->
             showSortPopupMenu(v)
@@ -129,11 +125,7 @@ class MainActivity : AppCompatActivity() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionUtils.onRequestPermissionsResult(requestCode, grantResults, {
-            lifecycleScope.launch {
-                startScan()
-            }
-        }, {
+        PermissionUtils.onRequestPermissionsResult(requestCode, grantResults, { startScan() }, {
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
         })
     }
