@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -13,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
@@ -34,6 +36,8 @@ class MainActivity : AppCompatActivity() {
     private var currentSortMode = SortMode.NAME
     private var currentSortComparator: Comparator<Item<*>>? = SortUtils.compareByName()
     private lateinit var manageStoragePermissionLauncher: ActivityResultLauncher<Intent>
+    private lateinit var topAppBar: MaterialToolbar
+    private lateinit var orderToggleMenuItem: MenuItem
 
     enum class SortMode {
         NAME, SIZE
@@ -54,6 +58,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        topAppBar = binding.topAppBar
+        orderToggleMenuItem = topAppBar.menu.findItem(R.id.orderToggleButton)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
@@ -76,15 +82,24 @@ class MainActivity : AppCompatActivity() {
         binding.deleteButton.setOnClickListener {
             DeletionUtils.deleteSelectedFiles(adapter, this) { startScan() }
         }
-        binding.sortButton.setOnClickListener {
-            showSortBottomSheet()
-        }
-        binding.orderToggleButton.setOnClickListener {
-            isAscending = !isAscending
-            updateToggleButtonIcon()
-            sortCurrentList(currentSortComparator)
-        }
 
+        topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.sortButton -> {
+                    showSortBottomSheet()
+                    true
+                }
+
+                R.id.orderToggleButton -> {
+                    isAscending = !isAscending
+                    updateToggleButtonIcon()
+                    sortCurrentList(currentSortComparator)
+                    true
+                }
+
+                else -> false
+            }
+        }
         updateToggleButtonIcon()
     }
 
@@ -108,9 +123,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateToggleButtonIcon() {
         if (isAscending) {
-            binding.orderToggleButton.setImageResource(R.drawable.sort_ascending)
+            orderToggleMenuItem.setIcon(R.drawable.sort_ascending)
         } else {
-            binding.orderToggleButton.setImageResource(R.drawable.sort_descending)
+            orderToggleMenuItem.setIcon(R.drawable.sort_descending)
         }
     }
 

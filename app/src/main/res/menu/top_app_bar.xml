@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sortButton"
+        android:contentDescription="@string/sort_by"
+        android:icon="@drawable/sort"
+        android:title="@string/sort_by"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/orderToggleButton"
+        android:contentDescription="@string/toggle_sort_order"
+        android:icon="@drawable/sort_ascending"
+        android:title="@string/toggle_sort_order"
+        app:showAsAction="ifRoom" />
+
+</menu>
