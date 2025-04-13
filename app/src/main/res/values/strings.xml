@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">DeDupe</string>
-    <string name="scan">Scan for Duplicates</string>
     <string name="delete_selected">Delete Selected</string>
+    <string name="name">Name</string>
+    <string name="no_duplicates_found">No duplicate files found.</string>
+    <string name="permission_denied">Permission denied.</string>
+    <string name="scan_failed">File scan failed.</string>
+    <string name="scan">Scan</string>
+    <string name="size">Size</string>
+    <string name="sort_by">Sort By</string>
     <string name="sort_options">Sort Options</string>
+    <string name="toggle_sort_order">Toggle Sort Order</string>
 </resources>

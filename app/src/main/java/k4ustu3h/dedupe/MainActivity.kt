@@ -2,7 +2,7 @@ package k4ustu3h.dedupe
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -31,14 +31,9 @@ class MainActivity : AppCompatActivity() {
     private val adapter =
         GroupAdapter<com.xwray.groupie.viewbinding.GroupieViewHolder<TreeDuplicateItemBinding>>()
     private var isAscending = false
-    private var currentSortMode = SortMode.NAME // Keep track of the current sort mode
+    private var currentSortMode = SortMode.NAME
     private var currentSortComparator: Comparator<Item<*>>? = SortUtils.compareByName()
-    private val manageStorageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (Environment.isExternalStorageManager()) {
-                startScan()
-            }
-        }
+    private lateinit var manageStoragePermissionLauncher: ActivityResultLauncher<Intent>
 
     enum class SortMode {
         NAME, SIZE
@@ -62,26 +57,53 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
-        binding.scanButton.setOnClickListener {
-            PermissionUtils.checkAndRequestManageStoragePermission(
-                this, manageStorageActivityResultLauncher
-            ) {
-                startScan()
+        manageStoragePermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (PermissionUtils.isManageExternalStorageGranted()) {
+                    startScan()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Storage permission not granted. Please grant it to scan.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
+
+        binding.scanButton.setOnClickListener {
+            checkManageStoragePermissionAndProceed()
         }
         binding.deleteButton.setOnClickListener {
             DeletionUtils.deleteSelectedFiles(adapter, this) { startScan() }
         }
-        binding.sortToggleButton.setOnClickListener {
-            toggleSortMode()
+        binding.sortButton.setOnClickListener {
+            showSortBottomSheet()
         }
         binding.orderToggleButton.setOnClickListener {
             isAscending = !isAscending
             updateToggleButtonIcon()
             sortCurrentList(currentSortComparator)
         }
+
         updateToggleButtonIcon()
-        updateSortToggleButtonIcon()
+    }
+
+    private fun showSortBottomSheet() {
+        val sortBottomSheetFragment = SortBottomSheetFragment(currentSortMode) { sortMode ->
+            currentSortMode = sortMode
+            updateSortComparator()
+            sortCurrentList(currentSortComparator)
+        }
+        sortBottomSheetFragment.show(supportFragmentManager, sortBottomSheetFragment.tag)
+    }
+
+    private fun checkManageStoragePermissionAndProceed() {
+        if (PermissionUtils.isManageExternalStorageGranted()) {
+            startScan()
+        } else {
+            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            manageStoragePermissionLauncher.launch(intent)
+        }
     }
 
     private fun updateToggleButtonIcon() {
@@ -92,29 +114,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleSortMode() {
-        currentSortMode = when (currentSortMode) {
-            SortMode.NAME -> SortMode.SIZE
-            SortMode.SIZE -> SortMode.NAME
-        }
-        updateSortComparator()
-        updateSortToggleButtonIcon()
-        sortCurrentList(currentSortComparator)
-    }
-
     private fun updateSortComparator() {
         currentSortComparator = when (currentSortMode) {
             SortMode.NAME -> SortUtils.compareByName()
             SortMode.SIZE -> SortUtils.compareBySize()
         }
-    }
-
-    private fun updateSortToggleButtonIcon() {
-        val icon = when (currentSortMode) {
-            SortMode.NAME -> R.drawable.sort_by_alpha
-            SortMode.SIZE -> R.drawable.sort_by_size
-        }
-        binding.sortToggleButton.setImageResource(icon)
     }
 
     private fun sortCurrentList(comparator: Comparator<Item<*>>?) {
@@ -139,12 +143,17 @@ class MainActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 binding.progressBar.visibility = View.GONE
-                if (scannedItems != null) {
+                if (scannedItems != null && scannedItems.isEmpty()) {
+                    Toast.makeText(
+                        this@MainActivity, R.string.no_duplicates_found, Toast.LENGTH_LONG
+                    ).show()
+                } else if (scannedItems != null) {
                     adapter.clear()
                     adapter.addAll(scannedItems)
-                    sortCurrentList(currentSortComparator) // Apply initial sort
+                    sortCurrentList(currentSortComparator)
                 } else {
-                    Toast.makeText(this@MainActivity, "File scan failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, R.string.scan_failed, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -154,8 +163,10 @@ class MainActivity : AppCompatActivity() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionUtils.onRequestPermissionsResult(requestCode, grantResults, { startScan() }, {
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+        PermissionUtils.onRequestPermissionsResult(grantResults, {
+            startScan()
+        }, {
+            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
         })
     }
 }
