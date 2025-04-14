@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">DeDupe</string>
     <string name="delete_selected">Delete Selected</string>
+    <string name="enable_file_size_limit">Enable File Size Limit</string>
     <string name="name">Name</string>
     <string name="no_duplicates_found">No duplicate files found.</string>
-    <string name="permission_denied">Permission denied.</string>
+    <string name="no_duplicates_to_delete">No Duplicates to delete</string>
+    <string name="only_scan_small_files_description">When enabled, only files smaller than 128MB will be included in the scan.</string>
+    <string name="permission_denied">Permission Denied</string>
     <string name="scan_failed">File scan failed.</string>
     <string name="scan">Scan</string>
+    <string name="settings">Settings</string>
     <string name="size">Size</string>
     <string name="sort_by">Sort By</string>
-    <string name="sort_options">Sort Options</string>
     <string name="toggle_sort_order">Toggle Sort Order</string>
 </resources>

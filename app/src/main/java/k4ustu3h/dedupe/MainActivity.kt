@@ -1,6 +1,7 @@
 package k4ustu3h.dedupe
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -38,6 +39,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manageStoragePermissionLauncher: ActivityResultLauncher<Intent>
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var orderToggleMenuItem: MenuItem
+    private lateinit var sharedPreferences: SharedPreferences
+    private var permissionCallback: (() -> Unit)? = null
 
     enum class SortMode {
         NAME, SIZE
@@ -60,13 +63,15 @@ class MainActivity : AppCompatActivity() {
 
         topAppBar = binding.topAppBar
         orderToggleMenuItem = topAppBar.menu.findItem(R.id.orderToggleButton)
+        sharedPreferences = getSharedPreferences("dedupe_settings", MODE_PRIVATE)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
         manageStoragePermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (PermissionUtils.isManageExternalStorageGranted()) {
-                    startScan()
+                    permissionCallback?.invoke()
+                    permissionCallback = null
                 } else {
                     Toast.makeText(
                         this,
@@ -77,10 +82,20 @@ class MainActivity : AppCompatActivity() {
             }
 
         binding.scanButton.setOnClickListener {
-            checkManageStoragePermissionAndProceed()
+            checkManageStoragePermissionAndProceed {
+                val enableFileSizeLimit = sharedPreferences.getBoolean("enable_file_size_limit", true)
+                startScan(enableFileSizeLimit)
+            }
         }
+
         binding.deleteButton.setOnClickListener {
-            DeletionUtils.deleteSelectedFiles(adapter, this) { startScan() }
+            if (adapter.itemCount > 0) {
+                DeletionUtils.deleteSelectedFiles(adapter, this) {
+                    startScan(sharedPreferences.getBoolean("enable_file_size_limit", true))
+                }
+            } else {
+                Toast.makeText(this, R.string.no_duplicates_to_delete, Toast.LENGTH_SHORT).show()
+            }
         }
 
         topAppBar.setOnMenuItemClickListener { menuItem ->
@@ -97,10 +112,34 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.settingsButton -> {
+                    val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
                 else -> false
             }
         }
         updateToggleButtonIcon()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (PermissionUtils.isManageExternalStorageGranted()) {
+            permissionCallback?.invoke()
+            permissionCallback = null
+        } else {
+            Toast.makeText(
+                this,
+                "Storage permission not granted. Please grant it to scan.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     private fun showSortBottomSheet() {
@@ -112,12 +151,13 @@ class MainActivity : AppCompatActivity() {
         sortBottomSheetFragment.show(supportFragmentManager, sortBottomSheetFragment.tag)
     }
 
-    private fun checkManageStoragePermissionAndProceed() {
+    private fun checkManageStoragePermissionAndProceed(onPermissionGranted: () -> Unit) {
         if (PermissionUtils.isManageExternalStorageGranted()) {
-            startScan()
+            onPermissionGranted()
         } else {
             val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
             manageStoragePermissionLauncher.launch(intent)
+            permissionCallback = onPermissionGranted
         }
     }
 
@@ -146,11 +186,11 @@ class MainActivity : AppCompatActivity() {
         adapter.addAll(currentItems)
     }
 
-    private fun startScan() {
+    private fun startScan(enableFileSizeLimit: Boolean) {
         binding.progressBar.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
             val scannedItems = try {
-                ScanUtils.scanForDuplicates()
+                ScanUtils.scanForDuplicates(enableFileSizeLimit)
             } catch (e: Exception) {
                 Log.e("startScan", "Error during scan", e)
                 null
@@ -179,7 +219,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         PermissionUtils.onRequestPermissionsResult(grantResults, {
-            startScan()
+            startScan(sharedPreferences.getBoolean("enable_file_size_limit", true))
         }, {
             Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
         })

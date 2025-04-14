@@ -1,5 +1,6 @@
 package k4ustu3h.dedupe.util
 
+import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -9,14 +10,19 @@ import kotlin.math.pow
 
 object FileUtils {
 
+    private const val SIZE_LIMIT = 128 * 1024 * 1024
+
     /**
      * Traverses the file system using Depth-First Search (DFS) and calculates file hashes.
      *
      * @param directory The starting directory for traversal.
      * @param fileMap A map to store file hashes and their corresponding files.
      */
-    fun traverseFiles(directory: File, fileMap: MutableMap<String, MutableList<File>>) {
-        // Get the list of files and directories in the current directory.
+    fun traverseFiles(
+        directory: File,
+        fileMap: MutableMap<String, MutableList<File>>,
+        enableFileSizeLimit: Boolean
+    ) {
         val files = directory.listFiles()
 
         // If the directory is empty or null, return.
@@ -26,14 +32,20 @@ object FileUtils {
         for (file in files) {
             // If the current file is a directory, recursively traverse it.
             if (file.isDirectory) {
-                traverseFiles(file, fileMap) // Recursive DFS call
+                traverseFiles(file, fileMap, enableFileSizeLimit)
             } else {
-                // If the current file is a regular file, calculate its SHA-256 hash.
-                val hash = calculateFileHash(file)
-
-                // If the hash is not null, add the file to the file map.
-                if (hash != null) {
-                    fileMap.getOrPut(hash) { mutableListOf() }.add(file)
+                Log.d("FileUtils", "Processing file: ${file.absolutePath}, size: ${file.length()}")
+                if (!enableFileSizeLimit || file.length() <= SIZE_LIMIT) {
+                    Log.d("FileUtils", "Including file for hashing: ${file.absolutePath}")
+                    val hash = calculateFileHash(file)
+                    if (hash != null) {
+                        fileMap.getOrPut(hash) { mutableListOf() }.add(file)
+                    }
+                } else {
+                    Log.d(
+                        "FileUtils",
+                        "Skipping large file (size limit): ${file.absolutePath}, size: ${file.length()}"
+                    )
                 }
             }
         }
@@ -45,7 +57,7 @@ object FileUtils {
      * @param file The file to calculate the hash for.
      * @return The SHA-256 hash as a hexadecimal string, or null if an error occurred.
      */
-    fun calculateFileHash(file: File): String? {
+    private fun calculateFileHash(file: File): String? {
         try {
             // Create a MessageDigest instance for SHA-256 hashing.
             val digest = MessageDigest.getInstance("SHA-256")
@@ -120,8 +132,8 @@ object FileUtils {
             }
 
             if (chunk1.isNotEmpty() && chunk2.isNotEmpty()) {
-                val n1 = chunk1.toString().toInt()
-                val n2 = chunk2.toString().toInt()
+                val n1 = chunk1.toString().toLongOrNull() ?: 0L
+                val n2 = chunk2.toString().toLongOrNull() ?: 0L
                 val comparison = n1.compareTo(n2)
                 if (comparison != 0) return comparison
             } else {

@@ -14,5 +14,10 @@
         android:icon="@drawable/sort_ascending"
         android:title="@string/toggle_sort_order"
         app:showAsAction="ifRoom" />
-
+    <item
+        android:id="@+id/settingsButton"
+        android:contentDescription="@string/settings"
+        android:icon="@drawable/settings"
+        android:title="@string/settings"
+        app:showAsAction="ifRoom" />
 </menu>

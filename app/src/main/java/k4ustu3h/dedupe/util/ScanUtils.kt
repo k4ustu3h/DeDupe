@@ -9,21 +9,23 @@ import java.io.File
 
 object ScanUtils {
 
-    suspend fun scanForDuplicates(): List<Item<*>> = withContext(Dispatchers.IO) {
-        val root = Environment.getExternalStorageDirectory()
-        val fileMap = mutableMapOf<String, MutableList<File>>()
-        FileUtils.traverseFiles(root, fileMap)
+    suspend fun scanForDuplicates(enableFileSizeLimit: Boolean): List<Item<*>> =
+        withContext(Dispatchers.IO) {
+            val root = Environment.getExternalStorageDirectory()
+            val fileMap = mutableMapOf<String, MutableList<File>>()
 
-        val allItems = mutableListOf<Item<*>>()
+            FileUtils.traverseFiles(root, fileMap, enableFileSizeLimit)
 
-        fileMap.values.forEach { files ->
-            if (files.size > 1) {
-                val duplicateGroup = DuplicateFilesGroup(files)
-                for (i in 0 until duplicateGroup.itemCount) {
-                    allItems.add(duplicateGroup.getItem(i))
+            val allItems = mutableListOf<Item<*>>()
+
+            fileMap.values.forEach { files ->
+                if (files.size > 1) {
+                    val duplicateGroup = DuplicateFilesGroup(files)
+                    for (i in 0 until duplicateGroup.itemCount) {
+                        allItems.add(duplicateGroup.getItem(i))
+                    }
                 }
             }
+            return@withContext allItems
         }
-        return@withContext allItems
-    }
 }
