@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="64dp"
                 android:text="@string/only_scan_small_files_description"
-                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                 android:textColor="?android:attr/textColorSecondary" />
 
         </LinearLayout>

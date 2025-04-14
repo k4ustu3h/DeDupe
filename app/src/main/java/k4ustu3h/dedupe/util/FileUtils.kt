@@ -99,8 +99,8 @@ object FileUtils {
             }
 
             if (chunk1.isNotEmpty() && chunk2.isNotEmpty()) {
-                val n1 = chunk1.toString().toLongOrNull() ?: 0L
-                val n2 = chunk2.toString().toLongOrNull() ?: 0L
+                val n1 = chunk1.toString().toIntOrNull() ?: 0
+                val n2 = chunk2.toString().toIntOrNull() ?: 0
                 val comparison = n1.compareTo(n2)
                 if (comparison != 0) return comparison
             } else {
