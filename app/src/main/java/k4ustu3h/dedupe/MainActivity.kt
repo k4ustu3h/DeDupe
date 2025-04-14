@@ -83,7 +83,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.scanButton.setOnClickListener {
             checkManageStoragePermissionAndProceed {
-                val enableFileSizeLimit = sharedPreferences.getBoolean("enable_file_size_limit", true)
+                val enableFileSizeLimit =
+                    sharedPreferences.getBoolean("enable_file_size_limit", true)
                 startScan(enableFileSizeLimit)
             }
         }
@@ -135,9 +136,7 @@ class MainActivity : AppCompatActivity() {
             permissionCallback = null
         } else {
             Toast.makeText(
-                this,
-                "Storage permission not granted. Please grant it to scan.",
-                Toast.LENGTH_LONG
+                this, "Storage permission not granted. Please grant it to scan.", Toast.LENGTH_LONG
             ).show()
         }
     }

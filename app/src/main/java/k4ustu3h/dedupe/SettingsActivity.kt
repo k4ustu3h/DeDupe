@@ -3,10 +3,10 @@ package k4ustu3h.dedupe
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import k4ustu3h.dedupe.databinding.ActivitySettingsBinding
-import androidx.core.content.edit
 
 class SettingsActivity : AppCompatActivity() {
 

@@ -36,14 +36,14 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.groupie)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.groupie.kotlin.android.extensions)
     implementation(libs.groupie.viewbinding)
+    implementation(libs.groupie)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.material)
 }

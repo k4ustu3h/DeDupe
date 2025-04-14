@@ -1,28 +1,27 @@
 [versions]
 agp = "8.9.1"
+appcompat = "1.7.0"
+constraintlayout = "2.2.1"
+coreKtx = "1.16.0"
 groupie = "2.10.1"
 kotlin = "2.1.0"
-coreKtx = "1.16.0"
-appcompat = "1.7.0"
 kotlinxCoroutinesAndroid = "1.8.1"
 lifecycleRuntimeKtx = "2.8.7"
 material = "1.12.0"
-constraintlayout = "2.2.1"
 recyclerview = "1.4.0"
 
 [libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 groupie = { group = "com.github.lisawray.groupie", name = "groupie", version.ref = "groupie" }
 groupie-kotlin-android-extensions = { group = "com.github.lisawray.groupie", name = "groupie-kotlin-android-extensions", version.ref = "groupie" }
 groupie-viewbinding = { module = "com.github.lisawray.groupie:groupie-viewbinding", version.ref = "groupie" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

@@ -12,12 +12,6 @@ object FileUtils {
 
     private const val SIZE_LIMIT = 128 * 1024 * 1024
 
-    /**
-     * Traverses the file system using Depth-First Search (DFS) and calculates file hashes.
-     *
-     * @param directory The starting directory for traversal.
-     * @param fileMap A map to store file hashes and their corresponding files.
-     */
     fun traverseFiles(
         directory: File,
         fileMap: MutableMap<String, MutableList<File>>,
@@ -25,12 +19,9 @@ object FileUtils {
     ) {
         val files = directory.listFiles()
 
-        // If the directory is empty or null, return.
         if (files == null) return
 
-        // Iterate through each file and directory.
         for (file in files) {
-            // If the current file is a directory, recursively traverse it.
             if (file.isDirectory) {
                 traverseFiles(file, fileMap, enableFileSizeLimit)
             } else {
@@ -51,57 +42,33 @@ object FileUtils {
         }
     }
 
-    /**
-     * Calculates the SHA-256 hash of a file.
-     *
-     * @param file The file to calculate the hash for.
-     * @return The SHA-256 hash as a hexadecimal string, or null if an error occurred.
-     */
     private fun calculateFileHash(file: File): String? {
         try {
-            // Create a MessageDigest instance for SHA-256 hashing.
             val digest = MessageDigest.getInstance("SHA-256")
-
-            // Create a FileInputStream to read the file's contents.
             val inputStream = FileInputStream(file)
-
-            // Create a buffer to read data in chunks.
             val buffer = ByteArray(8192)
-
-            // Read data from the file and update the MessageDigest.
             var bytesRead: Int
             while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                 digest.update(buffer, 0, bytesRead)
             }
 
-            // Get the hash bytes and convert them to a hexadecimal string.
             val hashBytes = digest.digest()
             return bytesToHex(hashBytes)
         } catch (e: Exception) {
-            // Handle exceptions (e.g., FileNotFoundException, NoSuchAlgorithmException).
             e.printStackTrace()
             return null
         }
     }
 
-    /**
-     * Converts a byte array to a hexadecimal string.
-     *
-     * @param bytes The byte array to convert.
-     * @return The hexadecimal string representation of the byte array.
-     */
     private fun bytesToHex(bytes: ByteArray): String {
-        // Create a character array to store the hexadecimal representation.
         val hexArray = CharArray(bytes.size * 2)
 
-        // Iterate through each byte and convert it to two hexadecimal characters.
         for (j in bytes.indices) {
             val v = bytes[j].toInt() and 0xFF
             hexArray[j * 2] = "0123456789ABCDEF"[v shr 4]
             hexArray[j * 2 + 1] = "0123456789ABCDEF"[v and 0x0F]
         }
 
-        // Return the hexadecimal string.
         return String(hexArray)
     }
 

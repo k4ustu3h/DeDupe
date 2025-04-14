@@ -10,23 +10,15 @@ class DuplicateFilesGroup(private val files: List<File>) : Group {
 
     override fun getItemCount(): Int = files.size
 
-    override fun getItem(position: Int): Item<*> =
-        DuplicateFileItem(files[position], position == 0)
+    override fun getItem(position: Int): Item<*> = DuplicateFileItem(files[position], position == 0)
 
-    override fun getPosition(item: Item<*>): Int =
-        files.indexOf((item as DuplicateFileItem).file)
+    override fun getPosition(item: Item<*>): Int = files.indexOf((item as DuplicateFileItem).file)
 
-    override fun registerGroupDataObserver(observer: GroupDataObserver) {
-        // Not needed for this implementation, but required by Group interface
-    }
+    override fun registerGroupDataObserver(observer: GroupDataObserver) {}
 
-    override fun unregisterGroupDataObserver(observer: GroupDataObserver) {
-        // Not needed for this implementation, but required by Group interface
-    }
+    override fun unregisterGroupDataObserver(observer: GroupDataObserver) {}
 
-    fun notifyChanged() {
-        // Not needed for this implementation, but required by Group interface
-    }
+    fun notifyChanged() {}
 
     fun getSelectedFiles(): Set<File> {
         val selectedFiles = mutableSetOf<File>()
