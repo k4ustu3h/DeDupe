@@ -8,15 +8,25 @@ import kotlin.math.pow
 
 object FileUtils {
 
-    fun traverseFiles(directory: File, fileMap: MutableMap<String, MutableList<File>>) {
+    const val FILE_SIZE_LIMIT_MB = 128L
+    const val FILE_SIZE_LIMIT_BYTES = FILE_SIZE_LIMIT_MB * 1024 * 1024
+
+    fun traverseFiles(
+        directory: File,
+        fileMap: MutableMap<String, MutableList<File>>,
+        applySizeLimit: Boolean = false
+    ) {
         val files = directory.listFiles()
 
         if (files == null) return
 
         for (file in files) {
             if (file.isDirectory) {
-                traverseFiles(file, fileMap)
+                traverseFiles(file, fileMap, applySizeLimit)
             } else {
+                if (applySizeLimit && file.length() > FILE_SIZE_LIMIT_BYTES) {
+                    continue
+                }
                 val hash = calculateFileHash(file)
 
                 if (hash != null) {

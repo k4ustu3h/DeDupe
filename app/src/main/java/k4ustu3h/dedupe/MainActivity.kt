@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
 import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val adapter =
         GroupAdapter<com.xwray.groupie.viewbinding.GroupieViewHolder<TreeDuplicateItemBinding>>()
+    private lateinit var topAppBar: MaterialToolbar
     private val MANAGE_STORAGE_REQUEST_CODE = 102
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        topAppBar = findViewById(R.id.topAppBar)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
@@ -54,6 +57,18 @@ class MainActivity : AppCompatActivity() {
         }
         binding.deleteButton.setOnClickListener {
             deleteSelectedFiles()
+        }
+
+        topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.settingsButton -> {
+                    val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                else -> false
+            }
         }
     }
 
@@ -112,7 +127,10 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val root = Environment.getExternalStorageDirectory()
             val fileMap = mutableMapOf<String, MutableList<File>>()
-            FileUtils.traverseFiles(root, fileMap)
+            val sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
+            val applySizeLimit = sharedPreferences.getBoolean("enable_file_size_limit", false)
+
+            FileUtils.traverseFiles(root, fileMap, applySizeLimit)
 
             withContext(Dispatchers.Main) {
                 binding.progressBar.visibility = View.GONE

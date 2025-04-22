@@ -45,4 +45,5 @@ dependencies {
     implementation(libs.groupie) // Or your desired version
     implementation(libs.groupie.kotlin.android.extensions)
     implementation(libs.groupie.viewbinding)
+    implementation(libs.androidx.activity)
 }
