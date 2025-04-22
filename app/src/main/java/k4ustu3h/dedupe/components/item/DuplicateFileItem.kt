@@ -1,9 +1,10 @@
-package k4ustu3h.dedupe
+package k4ustu3h.dedupe.components.item
 
 import android.graphics.Typeface
 import android.view.View
 import androidx.core.view.updatePadding
 import com.xwray.groupie.viewbinding.BindableItem
+import k4ustu3h.dedupe.R
 import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
 import k4ustu3h.dedupe.utils.FileUtils
 import java.io.File
@@ -11,27 +12,25 @@ import java.io.File
 class DuplicateFileItem(val file: File, private val isOriginal: Boolean) :
     BindableItem<TreeDuplicateItemBinding>() {
 
-    private var isSelected = false // Track selection state
+    private var isSelected = false
 
     override fun bind(viewBinding: TreeDuplicateItemBinding, position: Int) {
-        // Trim the file path
         val sdCard = "/storage/emulated/0/"
         val trimmedPath = file.absolutePath.replace(sdCard, "")
-        val fileSize = FileUtils.getFileSize(file) // Get file size
+        val fileSize = FileUtils.getFileSize(file)
 
         viewBinding.filePathTextView.text = trimmedPath
-        viewBinding.fileSizeTextView.text = fileSize // Display file size
+        viewBinding.fileSizeTextView.text = fileSize
         viewBinding.fileCheckBox.visibility = View.VISIBLE
 
         if (isOriginal) {
             viewBinding.root.updatePadding(left = 0)
-            viewBinding.filePathTextView.setTypeface(null, Typeface.BOLD) // Set bold text
+            viewBinding.filePathTextView.setTypeface(null, Typeface.BOLD)
         } else {
-            viewBinding.root.updatePadding(left = 64) // Indentation
-            viewBinding.filePathTextView.setTypeface(null, Typeface.NORMAL) // Ensure normal text
+            viewBinding.root.updatePadding(left = 64)
+            viewBinding.filePathTextView.setTypeface(null, Typeface.NORMAL)
         }
 
-        // Checkbox logic
         viewBinding.fileCheckBox.setOnCheckedChangeListener { _, isChecked ->
             isSelected = isChecked
         }

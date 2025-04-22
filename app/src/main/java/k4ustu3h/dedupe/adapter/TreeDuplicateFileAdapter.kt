@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe
+package k4ustu3h.dedupe.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +7,14 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
+import k4ustu3h.dedupe.R
 import java.io.File
 
 class TreeDuplicateFileAdapter(private val duplicateFileGroups: List<List<File>>) :
     RecyclerView.Adapter<TreeDuplicateFileAdapter.DuplicateFileGroupViewHolder>() {
 
     private val selectedFiles = mutableSetOf<File>()
-    private val indentation = 72 // Indentation value in dp
+    private val indentation = 72
 
     class DuplicateFileGroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fileCheckBox: CheckBox = itemView.findViewById(R.id.fileCheckBox)
@@ -52,11 +53,10 @@ class TreeDuplicateFileAdapter(private val duplicateFileGroups: List<List<File>>
 
             holder.fileCheckBox.isChecked = selectedFiles.contains(file)
 
-            // Apply indentation to duplicate items
             if (fileIndex > 0) {
                 holder.itemView.updatePadding(left = indentation)
             } else {
-                holder.itemView.updatePadding(left = 0) // No indentation for the "original" file
+                holder.itemView.updatePadding(left = 0)
             }
         }
     }
@@ -67,9 +67,5 @@ class TreeDuplicateFileAdapter(private val duplicateFileGroups: List<List<File>>
             totalItems += group.size
         }
         return totalItems
-    }
-
-    fun getSelectedFiles(): Set<File> {
-        return selectedFiles
     }
 }

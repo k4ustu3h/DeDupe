@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.xwray.groupie.GroupAdapter
+import k4ustu3h.dedupe.components.DuplicateFilesGroup
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
 import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
 import k4ustu3h.dedupe.utils.FileUtils
@@ -86,8 +87,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 intent.addCategory("android.intent.category.DEFAULT")
-                intent.data =
-                    String.format("package:%s", applicationContext.packageName).toUri()
+                intent.data = String.format("package:%s", applicationContext.packageName).toUri()
                 manageStorageActivityResultLauncher.launch(intent)
             } catch (e: Exception) {
                 val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
