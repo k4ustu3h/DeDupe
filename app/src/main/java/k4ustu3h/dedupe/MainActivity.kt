@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.DuplicateFilesGroup
+import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
-import k4ustu3h.dedupe.databinding.TreeDuplicateItemBinding
 import k4ustu3h.dedupe.utils.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter =
-        GroupAdapter<com.xwray.groupie.viewbinding.GroupieViewHolder<TreeDuplicateItemBinding>>()
+        GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
     private lateinit var topAppBar: MaterialToolbar
     private val MANAGE_STORAGE_REQUEST_CODE = 102
 
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 intent.addCategory("android.intent.category.DEFAULT")
                 intent.data = String.format("package:%s", applicationContext.packageName).toUri()
                 manageStorageActivityResultLauncher.launch(intent)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                 manageStorageActivityResultLauncher.launch(intent)
             }
@@ -139,6 +139,11 @@ class MainActivity : AppCompatActivity() {
                     if (files.size > 1) {
                         adapter.add(DuplicateFilesGroup(files))
                     }
+                }
+                if (adapter.itemCount == 0) {
+                    Toast.makeText(
+                        this@MainActivity, "No duplicate files found", Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
