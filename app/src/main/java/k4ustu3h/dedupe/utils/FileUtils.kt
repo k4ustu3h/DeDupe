@@ -1,5 +1,6 @@
 package k4ustu3h.dedupe.utils
 
+import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 import java.security.MessageDigest
@@ -9,8 +10,10 @@ import kotlin.math.pow
 
 object FileUtils {
 
+    private const val TAG = "FileUtils"
     const val FILE_SIZE_LIMIT_MB = 128L
     const val FILE_SIZE_LIMIT_BYTES = FILE_SIZE_LIMIT_MB * 1024 * 1024
+    private const val NOMEDIA_FILE = ".nomedia"
 
     fun traverseFiles(
         directory: File,
@@ -19,18 +22,37 @@ object FileUtils {
     ) {
         val files = directory.listFiles()
 
-        if (files == null) return
+        if (files == null) {
+            Log.w(TAG, "listFiles returned null for directory: ${directory.absolutePath}")
+            return
+        }
 
         for (file in files) {
+            Log.v(TAG, "Processing file/directory: ${file.absolutePath}")
+            if (file.name == NOMEDIA_FILE) {
+                Log.v(TAG, "Skipping .nomedia file: ${file.absolutePath}")
+                continue
+            }
             if (file.isDirectory) {
+                Log.v(TAG, "Traversing subdirectory: ${file.absolutePath}")
                 traverseFiles(file, fileMap, applySizeLimit)
             } else {
                 if (applySizeLimit && file.length() > FILE_SIZE_LIMIT_BYTES) {
+                    Log.v(
+                        TAG,
+                        "Skipping file due to size limit: ${file.absolutePath} (${getFileSize(file)})"
+                    )
                     continue
                 }
                 val hash = calculateFileHash(file)
                 if (hash != null) {
                     fileMap.getOrPut(hash) { mutableListOf() }.add(file)
+                    Log.d(
+                        TAG,
+                        "File added to map (hash: $hash): ${file.absolutePath} (${getFileSize(file)})"
+                    )
+                } else {
+                    Log.e(TAG, "Could not calculate hash for file: ${file.absolutePath}")
                 }
             }
         }
@@ -48,7 +70,7 @@ object FileUtils {
             val hashBytes = digest.digest()
             return bytesToHex(hashBytes)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Error calculating hash for ${file.absolutePath}: ${e.message}")
             return null
         }
     }
