@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.DuplicateFilesGroup
@@ -29,10 +30,10 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val adapter =
-        GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
+    private val adapter = GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
     private lateinit var topAppBar: MaterialToolbar
     private val MANAGE_STORAGE_REQUEST_CODE = 102
+    private lateinit var recyclerview: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +50,11 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        recyclerview = findViewById(R.id.recyclerView)
         topAppBar = findViewById(R.id.topAppBar)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
+
+        recyclerview.layoutManager = LinearLayoutManager(this)
+        recyclerview.adapter = adapter
 
         binding.scanButton.setOnClickListener {
             checkAndRequestManageStoragePermission()
