@@ -7,6 +7,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -31,9 +32,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter = GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
+    private lateinit var recyclerView: RecyclerView
     private lateinit var topAppBar: MaterialToolbar
+    private lateinit var welcomeLayout: LinearLayout
     private val MANAGE_STORAGE_REQUEST_CODE = 102
-    private lateinit var recyclerview: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +52,16 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        recyclerview = findViewById(R.id.recyclerView)
+        recyclerView = findViewById(R.id.recyclerView)
         topAppBar = findViewById(R.id.topAppBar)
+        welcomeLayout = findViewById(R.id.welcomeLayout)
 
-        recyclerview.layoutManager = LinearLayoutManager(this)
-        recyclerview.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
 
         binding.scanButton.setOnClickListener {
+            welcomeLayout.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
             checkAndRequestManageStoragePermission()
         }
         binding.deleteButton.setOnClickListener {
