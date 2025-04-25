@@ -2,6 +2,7 @@
 activity = "1.10.1"
 agp = "8.9.2"
 appcompat = "1.7.0"
+balloon = "1.6.0"
 coreKtx = "1.16.0"
 groupie = "2.10.1"
 kotlin = "2.1.20"
@@ -15,6 +16,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+balloon = { module = "com.github.skydoves:balloon", version.ref = "balloon" }
 groupie = { group = "com.github.lisawray.groupie", name = "groupie", version.ref = "groupie" }
 groupie-kotlin-android-extensions = { group = "com.github.lisawray.groupie", name = "groupie-kotlin-android-extensions", version.ref = "groupie" }
 groupie-viewbinding = { module = "com.github.lisawray.groupie:groupie-viewbinding", version.ref = "groupie" }

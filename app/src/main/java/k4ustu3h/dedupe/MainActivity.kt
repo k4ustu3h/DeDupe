@@ -11,12 +11,16 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.skydoves.balloon.ArrowOrientation
+import com.skydoves.balloon.Balloon
+import com.skydoves.balloon.BalloonAnimation
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.DuplicateFilesGroup
 import k4ustu3h.dedupe.components.card.DuplicateFileCard
@@ -52,6 +56,9 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val sharedPref = getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
+        val tooltipShown = sharedPref.getBoolean("settings_tooltip_shown", false)
+
         recyclerView = findViewById(R.id.recyclerView)
         topAppBar = findViewById(R.id.topAppBar)
         welcomeLayout = findViewById(R.id.welcomeLayout)
@@ -77,6 +84,24 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 else -> false
+            }
+        }
+
+        if (!tooltipShown) {
+            topAppBar.post {
+                val settingsButton = topAppBar.findViewById<View>(R.id.settingsButton)
+                if (settingsButton != null) {
+                    val balloon = Balloon.Builder(this).setArrowOrientation(ArrowOrientation.TOP)
+                        .setArrowPosition(0.81f).setArrowSize(10)
+                        .setBackgroundColor(getColor(R.color.primaryContainer))
+                        .setBalloonAnimation(BalloonAnimation.FADE).setPadding(12)
+                        .setText(getString(R.string.tooltip_size_limit)).setTextSize(12f)
+                        .setCornerRadius(10f).setWidthRatio(0.5f).setLifecycleOwner(this).build()
+
+                    balloon.showAlignBottom(settingsButton)
+
+                    sharedPref.edit { putBoolean("settings_tooltip_shown", true) }
+                }
             }
         }
     }
