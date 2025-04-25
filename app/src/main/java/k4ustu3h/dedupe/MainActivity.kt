@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var welcomeLayout: LinearLayout
-    private val MANAGE_STORAGE_REQUEST_CODE = 102
+    private val permissionRequestCode = 102
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == MANAGE_STORAGE_REQUEST_CODE) {
+        if (requestCode == permissionRequestCode) {
             if (Environment.isExternalStorageManager()) {
                 startScan()
             } else {
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == MANAGE_STORAGE_REQUEST_CODE) {
+        if (requestCode == permissionRequestCode) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScan()
             } else {
