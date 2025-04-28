@@ -15,8 +15,8 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.skydoves.androidveil.VeilRecyclerFrameView
 import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.BalloonAnimation
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter = GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: VeilRecyclerFrameView
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var welcomeLayout: LinearLayout
     private val permissionRequestCode = 102
@@ -57,12 +57,13 @@ class MainActivity : AppCompatActivity() {
         topAppBar = findViewById(R.id.topAppBar)
         welcomeLayout = findViewById(R.id.welcomeLayout)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        recyclerView.setAdapter(adapter)
+        recyclerView.setLayoutManager(LinearLayoutManager(this))
+        recyclerView.addVeiledItems(1)
 
         binding.scanButton.setOnClickListener {
             welcomeLayout.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
+            recyclerView.veil()
             checkAndRequestManageStoragePermission()
         }
         binding.deleteButton.setOnClickListener {
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity() {
             if (Environment.isExternalStorageManager()) {
                 startScan()
             } else {
+                recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
@@ -131,6 +133,7 @@ class MainActivity : AppCompatActivity() {
             if (Environment.isExternalStorageManager()) {
                 startScan()
             } else {
+                recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
@@ -144,13 +147,17 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScan()
             } else {
+                recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun startScan() {
-        ScanUtils.scanForDuplicates(this, binding.progressBar, adapter)
+        recyclerView.veil()
+        ScanUtils.scanForDuplicates(this, adapter) {
+            recyclerView.unVeil()
+        }
     }
 
     private fun deleteSelectedFiles() {

@@ -36,11 +36,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidveil)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.recyclerview)
     implementation(libs.balloon)
     implementation(libs.groupie)
     implementation(libs.groupie.kotlin.android.extensions)

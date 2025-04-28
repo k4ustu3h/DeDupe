@@ -62,10 +62,7 @@ class DuplicateFileCard(private val files: List<File>) :
 
                 val divider = LayoutInflater.from(viewHolder.itemView.context)
                     .inflate(R.layout.item_divider, viewHolder.duplicateContainer, false)
-                val dividerParams = divider.layoutParams as LinearLayout.LayoutParams
-                dividerParams.marginStart =
-                    viewHolder.itemView.resources.getDimensionPixelOffset(R.dimen.duplicate_indentation)
-                divider.layoutParams = dividerParams
+
                 viewHolder.duplicateContainer.addView(divider)
 
                 viewHolder.duplicateContainer.addView(duplicateView)

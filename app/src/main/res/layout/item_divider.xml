@@ -2,6 +2,6 @@
 <com.google.android.material.divider.MaterialDivider xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="1dp"
+    android:layout_height="wrap_content"
     app:dividerInsetEnd="16dp"
-    app:dividerInsetStart="16dp" />
+    app:dividerInsetStart="40dp" />

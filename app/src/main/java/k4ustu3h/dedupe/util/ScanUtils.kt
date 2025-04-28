@@ -2,8 +2,6 @@ package k4ustu3h.dedupe.util
 
 import android.content.Context
 import android.os.Environment
-import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.DuplicateFilesGroup
@@ -17,10 +15,9 @@ import java.io.File
 object ScanUtils {
     fun scanForDuplicates(
         context: Context,
-        progressBar: ProgressBar,
-        adapter: GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>
+        adapter: GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>,
+        onScanComplete: () -> Unit
     ) {
-        progressBar.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
             val sharedPreferences =
                 context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
@@ -31,7 +28,6 @@ object ScanUtils {
             FileUtils.traverseFiles(root, fileMap, applySizeLimit)
 
             withContext(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
                 adapter.clear()
                 fileMap.values.forEach { files ->
                     if (files.size > 1) {
@@ -41,6 +37,7 @@ object ScanUtils {
                 if (adapter.itemCount == 0) {
                     Toast.makeText(context, "No duplicate files found", Toast.LENGTH_SHORT).show()
                 }
+                onScanComplete()
             }
         }
     }
