@@ -28,26 +28,26 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.skydoves.androidveil.VeilRecyclerFrameView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:veilFrame_baseAlpha="0.5"
-        app:veilFrame_baseColor="?attr/colorOnSurface"
-        app:veilFrame_dropOff="1"
-        app:veilFrame_highlightAlpha="1.0"
-        app:veilFrame_highlightColor="?attr/colorOnSurfaceVariant"
-        app:veilFrame_isItemWrapContentHeight="false"
-        app:veilFrame_isItemWrapContentWidth="false"
-        app:veilFrame_layout="@layout/layout_skeleton"
-        app:veilFrame_shimmerEnable="true"
-        app:veilFrame_veiled="false" />
-
     <FrameLayout
+        android:id="@+id/contentFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.skydoves.androidveil.VeilRecyclerFrameView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:veilFrame_baseAlpha="0.5"
+            app:veilFrame_baseColor="?attr/colorOnSurface"
+            app:veilFrame_dropOff="1"
+            app:veilFrame_highlightAlpha="1.0"
+            app:veilFrame_highlightColor="?attr/colorOnSurfaceVariant"
+            app:veilFrame_isItemWrapContentHeight="false"
+            app:veilFrame_isItemWrapContentWidth="false"
+            app:veilFrame_layout="@layout/layout_skeleton"
+            app:veilFrame_shimmerEnable="true"
+            app:veilFrame_veiled="false" />
 
         <LinearLayout
             android:id="@+id/welcomeLayout"

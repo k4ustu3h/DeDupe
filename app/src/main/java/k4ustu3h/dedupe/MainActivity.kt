@@ -25,6 +25,7 @@ import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
 import k4ustu3h.dedupe.transition.ButtonTransitions
+import k4ustu3h.dedupe.transition.ViewTransitions
 import k4ustu3h.dedupe.util.DeletionUtils
 import k4ustu3h.dedupe.util.PermissionUtils
 import k4ustu3h.dedupe.util.ScanUtils
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.setAdapter(adapter)
         recyclerView.setLayoutManager(LinearLayoutManager(this))
         recyclerView.addVeiledItems(1)
+        recyclerView.visibility = View.GONE
 
         deleteButton.visibility = View.GONE
 
@@ -78,8 +80,8 @@ class MainActivity : AppCompatActivity() {
             if (!isScanning) {
                 isScanning = true
                 scanButton.isEnabled = false
-                welcomeLayout.visibility = View.GONE
-                recyclerView.veil()
+                ViewTransitions.fadeOut(welcomeLayout)
+                ViewTransitions.fadeIn(recyclerView)
                 binding.deleteButton.visibility = View.GONE
                 TransitionManager.beginDelayedTransition(
                     binding.buttonLayout, ButtonTransitions.createButtonTransition()
@@ -90,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 checkAndRequestManageStoragePermission()
             }
         }
+
         binding.deleteButton.setOnClickListener {
             deleteSelectedFiles()
         }
@@ -133,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                 isScanning = false
                 scanButton.isEnabled = true
                 recyclerView.unVeil()
+                ViewTransitions.fadeIn(recyclerView)
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
                 TransitionManager.beginDelayedTransition(
                     binding.buttonLayout, ButtonTransitions.createButtonTransition()
@@ -189,10 +193,13 @@ class MainActivity : AppCompatActivity() {
                     binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
                 )
                 binding.deleteButton.visibility = View.VISIBLE
+                welcomeLayout.visibility = View.GONE
             } else {
                 ButtonTransitions.applyScanButtonExpand(
                     binding.main, binding.buttonLayout, binding.scanButton
                 )
+                ViewTransitions.fadeIn(welcomeLayout)
+                recyclerView.visibility = View.GONE
                 binding.deleteButton.visibility = View.GONE
                 Toast.makeText(this, "No duplicate files found", Toast.LENGTH_SHORT).show()
             }
