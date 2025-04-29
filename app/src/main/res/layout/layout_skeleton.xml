@@ -11,8 +11,4 @@
 
     <include layout="@layout/card_skeleton" />
 
-    <include layout="@layout/card_skeleton" />
-
-    <include layout="@layout/card_skeleton" />
-
 </LinearLayout>

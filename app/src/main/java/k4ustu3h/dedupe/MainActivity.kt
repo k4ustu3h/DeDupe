@@ -5,17 +5,21 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.transition.TransitionManager
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.card.MaterialCardView
 import com.skydoves.androidveil.VeilRecyclerFrameView
 import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
@@ -23,6 +27,7 @@ import com.skydoves.balloon.BalloonAnimation
 import com.xwray.groupie.GroupAdapter
 import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
+import k4ustu3h.dedupe.transition.ButtonTransitions
 import k4ustu3h.dedupe.util.DeletionUtils
 import k4ustu3h.dedupe.util.ScanUtils
 
@@ -30,9 +35,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter = GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
+    private lateinit var buttonLayoutContainer: MaterialCardView
+    private lateinit var deleteButton: Button
+    private lateinit var mainLayout: ConstraintLayout
     private lateinit var recyclerView: VeilRecyclerFrameView
+    private lateinit var scanButton: Button
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var welcomeLayout: LinearLayout
+    private var isScanning = false
     private val permissionRequestCode = 102
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +63,11 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("onboarding_prefs", MODE_PRIVATE)
         val tooltipShown = sharedPref.getBoolean("settings_tooltip_shown", false)
 
+        buttonLayoutContainer = findViewById(R.id.buttonLayout)
+        deleteButton = findViewById(R.id.deleteButton)
+        mainLayout = findViewById(R.id.main)
         recyclerView = findViewById(R.id.recyclerView)
+        scanButton = findViewById(R.id.scanButton)
         topAppBar = findViewById(R.id.topAppBar)
         welcomeLayout = findViewById(R.id.welcomeLayout)
 
@@ -61,10 +75,23 @@ class MainActivity : AppCompatActivity() {
         recyclerView.setLayoutManager(LinearLayoutManager(this))
         recyclerView.addVeiledItems(1)
 
+        deleteButton.visibility = View.GONE
+
         binding.scanButton.setOnClickListener {
-            welcomeLayout.visibility = View.GONE
-            recyclerView.veil()
-            checkAndRequestManageStoragePermission()
+            if (!isScanning) {
+                isScanning = true
+                scanButton.isEnabled = false
+                welcomeLayout.visibility = View.GONE
+                recyclerView.veil()
+                binding.deleteButton.visibility = View.GONE
+                TransitionManager.beginDelayedTransition(
+                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
+                )
+                ButtonTransitions.applyScanButtonExpand(
+                    binding.main, binding.buttonLayout, binding.scanButton
+                )
+                checkAndRequestManageStoragePermission()
+            }
         }
         binding.deleteButton.setOnClickListener {
             deleteSelectedFiles()
@@ -106,8 +133,18 @@ class MainActivity : AppCompatActivity() {
             if (Environment.isExternalStorageManager()) {
                 startScan()
             } else {
+                isScanning = false
+                scanButton.isEnabled = true
                 recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                TransitionManager.beginDelayedTransition(
+                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
+                )
+                ButtonTransitions.applyScanButtonContract(
+                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
+                )
+                binding.deleteButton.visibility =
+                    if (adapter.itemCount > 0) View.VISIBLE else View.GONE
             }
         }
 
@@ -133,8 +170,18 @@ class MainActivity : AppCompatActivity() {
             if (Environment.isExternalStorageManager()) {
                 startScan()
             } else {
+                isScanning = false
+                scanButton.isEnabled = true
                 recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                TransitionManager.beginDelayedTransition(
+                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
+                )
+                ButtonTransitions.applyScanButtonContract(
+                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
+                )
+                binding.deleteButton.visibility =
+                    if (adapter.itemCount > 0) View.VISIBLE else View.GONE
             }
         }
     }
@@ -147,20 +194,61 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScan()
             } else {
+                isScanning = false
+                scanButton.isEnabled = true
                 recyclerView.unVeil()
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                TransitionManager.beginDelayedTransition(
+                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
+                )
+                ButtonTransitions.applyScanButtonContract(
+                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
+                )
+                binding.deleteButton.visibility =
+                    if (adapter.itemCount > 0) View.VISIBLE else View.GONE
             }
         }
     }
 
     private fun startScan() {
+        isScanning = true
+        scanButton.isEnabled = false
         recyclerView.veil()
+        binding.deleteButton.visibility = View.GONE
+        TransitionManager.beginDelayedTransition(
+            binding.buttonLayout, ButtonTransitions.createButtonTransition()
+        )
+        ButtonTransitions.applyScanButtonExpand(
+            binding.main, binding.buttonLayout, binding.scanButton
+        )
+
         ScanUtils.scanForDuplicates(this, adapter) {
+            isScanning = false
+            scanButton.isEnabled = true
             recyclerView.unVeil()
+            TransitionManager.beginDelayedTransition(
+                binding.buttonLayout, ButtonTransitions.createButtonTransition()
+            )
+            if (adapter.itemCount > 0) {
+                ButtonTransitions.applyScanButtonContract(
+                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
+                )
+                binding.deleteButton.visibility = View.VISIBLE
+            } else {
+                ButtonTransitions.applyScanButtonExpand(
+                    binding.main, binding.buttonLayout, binding.scanButton
+                )
+                binding.deleteButton.visibility = View.GONE
+                Toast.makeText(this, "No duplicate files found", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun deleteSelectedFiles() {
+        TransitionManager.beginDelayedTransition(
+            binding.buttonLayout, ButtonTransitions.createButtonTransition()
+        )
+        binding.deleteButton.visibility = View.GONE
         DeletionUtils.deleteSelected(this, adapter) { startScan() }
     }
 }
