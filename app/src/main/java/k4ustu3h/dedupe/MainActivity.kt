@@ -1,10 +1,8 @@
 package k4ustu3h.dedupe
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings
 import android.transition.TransitionManager
 import android.view.View
 import android.widget.Button
@@ -14,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +26,7 @@ import k4ustu3h.dedupe.components.card.DuplicateFileCard
 import k4ustu3h.dedupe.databinding.ActivityMainBinding
 import k4ustu3h.dedupe.transition.ButtonTransitions
 import k4ustu3h.dedupe.util.DeletionUtils
+import k4ustu3h.dedupe.util.PermissionUtils
 import k4ustu3h.dedupe.util.ScanUtils
 
 class MainActivity : AppCompatActivity() {
@@ -43,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var welcomeLayout: LinearLayout
     private var isScanning = false
-    private val permissionRequestCode = 102
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,16 +146,10 @@ class MainActivity : AppCompatActivity() {
         }
 
     private fun checkAndRequestManageStoragePermission() {
-        if (!Environment.isExternalStorageManager()) {
-            try {
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = String.format("package:%s", applicationContext.packageName).toUri()
-                manageStorageActivityResultLauncher.launch(intent)
-            } catch (_: Exception) {
-                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                manageStorageActivityResultLauncher.launch(intent)
-            }
+        if (!PermissionUtils.checkManageStoragePermission()) {
+            PermissionUtils.requestManageStoragePermission(
+                manageStorageActivityResultLauncher, this
+            )
         } else {
             startScan()
         }
@@ -166,48 +157,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == permissionRequestCode) {
-            if (Environment.isExternalStorageManager()) {
-                startScan()
-            } else {
-                isScanning = false
-                scanButton.isEnabled = true
-                recyclerView.unVeil()
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-                TransitionManager.beginDelayedTransition(
-                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
-                )
-                ButtonTransitions.applyScanButtonContract(
-                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
-                )
-                binding.deleteButton.visibility =
-                    if (adapter.itemCount > 0) View.VISIBLE else View.GONE
-            }
-        }
     }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == permissionRequestCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startScan()
-            } else {
-                isScanning = false
-                scanButton.isEnabled = true
-                recyclerView.unVeil()
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-                TransitionManager.beginDelayedTransition(
-                    binding.buttonLayout, ButtonTransitions.createButtonTransition()
-                )
-                ButtonTransitions.applyScanButtonContract(
-                    binding.main, binding.buttonLayout, binding.scanButton, binding.deleteButton
-                )
-                binding.deleteButton.visibility =
-                    if (adapter.itemCount > 0) View.VISIBLE else View.GONE
-            }
-        }
     }
 
     private fun startScan() {
