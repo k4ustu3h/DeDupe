@@ -1,19 +1,19 @@
-package k4ustu3h.dedupe
+package k4ustu3h.safai
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import k4ustu3h.dedupe.databinding.ActivitySettingsBinding
+import k4ustu3h.safai.databinding.ActivityDedupeSettingsBinding
 
-class SettingsActivity : AppCompatActivity() {
+class DeDupeSettingsActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: ActivityDedupeSettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        binding = ActivityDedupeSettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

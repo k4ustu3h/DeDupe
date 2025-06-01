@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe
+package k4ustu3h.safai
 
 import android.content.Intent
 import android.os.Bundle
@@ -22,17 +22,17 @@ import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.BalloonAnimation
 import com.xwray.groupie.GroupAdapter
-import k4ustu3h.dedupe.components.card.DuplicateFileCard
-import k4ustu3h.dedupe.databinding.ActivityMainBinding
-import k4ustu3h.dedupe.transition.ButtonTransitions
-import k4ustu3h.dedupe.transition.ViewTransitions
-import k4ustu3h.dedupe.util.DeletionUtils
-import k4ustu3h.dedupe.util.PermissionUtils
-import k4ustu3h.dedupe.util.ScanUtils
+import k4ustu3h.safai.databinding.ActivityDedupeBinding
+import k4ustu3h.safai.dedupe.components.card.DuplicateFileCard
+import k4ustu3h.safai.dedupe.transition.ButtonTransitions
+import k4ustu3h.safai.dedupe.transition.ViewTransitions
+import k4ustu3h.safai.dedupe.util.DeletionUtils
+import k4ustu3h.safai.dedupe.util.PermissionUtils
+import k4ustu3h.safai.dedupe.util.ScanUtils
 
-class MainActivity : AppCompatActivity() {
+class DeDupeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityDedupeBinding
     private val adapter = GroupAdapter<DuplicateFileCard.DuplicateFileCardViewHolder>()
     private lateinit var buttonLayoutContainer: MaterialCardView
     private lateinit var deleteButton: Button
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityDedupeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.settingsButton -> {
-                    val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                    val intent = Intent(this@DeDupeActivity, DeDupeSettingsActivity::class.java)
                     startActivity(intent)
                     true
                 }

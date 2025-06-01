@@ -1,11 +1,11 @@
-package k4ustu3h.dedupe.util
+package k4ustu3h.safai.dedupe.util
 
 import android.content.Context
 import android.os.Environment
 import android.widget.Toast
 import com.xwray.groupie.GroupAdapter
-import k4ustu3h.dedupe.components.DuplicateFilesGroup
-import k4ustu3h.dedupe.components.card.DuplicateFileCard
+import k4ustu3h.safai.dedupe.components.DuplicateFilesGroup
+import k4ustu3h.safai.dedupe.components.card.DuplicateFileCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe.components.card
+package k4ustu3h.safai.dedupe.components.card
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import android.widget.TextView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
-import k4ustu3h.dedupe.R
-import k4ustu3h.dedupe.util.FileUtils
+import k4ustu3h.safai.R
+import k4ustu3h.safai.dedupe.util.FileUtils
 import java.io.File
 
 class DuplicateFileCard(private val files: List<File>) :

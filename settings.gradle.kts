@@ -21,6 +21,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DeDupe"
+rootProject.name = "Safai"
 include(":app")
  

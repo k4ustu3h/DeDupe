@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "k4ustu3h.dedupe"
+    namespace = "k4ustu3h.safai"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "k4ustu3h.dedupe"
+        applicationId = namespace
         minSdk = 33
         targetSdk = compileSdk
         versionCode = 3

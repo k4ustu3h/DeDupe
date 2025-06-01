@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DeDupe</string>
+    <string name="app_name">Safai</string>
     <string name="delete_selected">Delete Selected</string>
     <string name="enable_file_size_limit">Enable File Size Limit (128 MB)</string>
     <string name="only_scan_small_files_description">Only scan files smaller than 128 MB. This can significantly speed up the scanning process.</string>

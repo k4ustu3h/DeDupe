@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe.transition
+package k4ustu3h.safai.dedupe.transition
 
 import android.transition.AutoTransition
 import android.transition.TransitionSet
@@ -6,7 +6,7 @@ import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.google.android.material.card.MaterialCardView
-import k4ustu3h.dedupe.R
+import k4ustu3h.safai.R
 
 object ButtonTransitions {
     fun createButtonTransition(): TransitionSet {

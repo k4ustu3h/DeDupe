@@ -1,4 +1,4 @@
-package k4ustu3h.dedupe.transition
+package k4ustu3h.safai.dedupe.transition
 
 import android.transition.Fade
 import android.transition.TransitionManager

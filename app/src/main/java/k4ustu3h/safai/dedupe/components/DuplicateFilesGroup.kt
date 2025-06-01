@@ -1,9 +1,9 @@
-package k4ustu3h.dedupe.components
+package k4ustu3h.safai.dedupe.components
 
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupDataObserver
 import com.xwray.groupie.Item
-import k4ustu3h.dedupe.components.card.DuplicateFileCard
+import k4ustu3h.safai.dedupe.components.card.DuplicateFileCard
 import java.io.File
 
 class DuplicateFilesGroup(files: List<File>) : Group {
