@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "k4ustu3h.dedupe"
         minSdk = 33
-        targetSdk = 35
+        targetSdk = compileSdk
         versionCode = 2
         versionName = "1.1.0"
     }
