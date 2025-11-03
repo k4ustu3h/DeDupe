@@ -1,14 +1,14 @@
 [versions]
-activity = "1.10.1"
-agp = "8.10.1"
+activity = "1.11.0"
+agp = "8.13.0"
 androidveil = "1.1.4"
-appcompat = "1.7.0"
-balloon = "1.6.0"
-coreKtx = "1.16.0"
+appcompat = "1.7.1"
+balloon = "1.6.13"
+coreKtx = "1.17.0"
 groupie = "2.10.1"
-kotlin = "2.1.20"
-lifecycleRuntimeKtx = "2.9.0"
-material = "1.14.0-alpha01"
+kotlin = "2.2.21"
+lifecycleRuntimeKtx = "2.9.4"
+material = "1.14.0-alpha06"
 
 [libraries]
 androidveil = { group = "com.github.skydoves", name = "androidveil", version.ref = "androidveil" }
